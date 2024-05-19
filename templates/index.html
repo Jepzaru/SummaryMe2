@@ -3,22 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SummaryMe</title>
+    <title>SummaryMe - AI ChatBot Summarizer</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="icon" href="static/favico.png" type="image/x-icon">
 </head>
 <body>
     <div class="subheader">
-        <h1>Summary<span class="highlight">Me</span></h1>
+        <h1><img src="static/logo.png" alt="Logo">Summary<span class="highlight">Me</span></h1>
+    </div>
+    <div class="history-chats">
+        <p>Chat History</p>
     </div>
     <div class="chat-container" id="chat-container">
+        <div class="center-logo">
+           <h4>👋Welcome to SummaryMe!</h4>
+        </div>
         <!-- Messages will be dynamically added here -->
     </div>
 
     <input id="input-text" placeholder="Enter text to summarize"></input>
-    <button id="summarize-btn" disabled>&#10148;</button>
-
+    <button id="summarize-btn" disabled><i class="fas fa-paper-plane"></i></button>
 
     <script>
         const inputText = document.getElementById("input-text");
@@ -36,6 +42,7 @@
             var text = inputText.value;
             addMessage("user", text);
             inputText.value = "";
+            summarizeBtn.disabled = true; // Disable button after sending message
             setTimeout(function() {
                 addTypingAnimation();
                 fetch('/summarize', {
@@ -49,9 +56,11 @@
                 .then(data => {
                     removeTypingAnimation();
                     addMessage("bot", data.summary);
+                    summarizeBtn.disabled = false; // Re-enable button after bot response
                 })
                 .catch((error) => {
                     console.error('Error:', error);
+                    summarizeBtn.disabled = false; // Re-enable button if there's an error
                 });
             }, 1000);
         
@@ -59,9 +68,24 @@
 
         function addMessage(sender, message) {
             var container = document.getElementById("chat-container");
+            var logo = document.getElementById("center-logo");
+            if (logo) {
+                logo.classList.add("hidden");
+            }
+
             var messageElement = document.createElement("div");
             messageElement.classList.add(sender + "-message");
-            messageElement.innerHTML = message; 
+            
+            var icon = document.createElement("span");
+            icon.classList.add("icon");
+            if (sender === "user") {
+                icon.innerHTML = '<i class="fas fa-user"></i>'; // Font Awesome user icon
+            } else {
+                icon.innerHTML = '<i class="fas fa-robot"></i>'; // Font Awesome robot icon
+            }
+            
+            messageElement.appendChild(icon);
+            messageElement.innerHTML += message;
 
             var br = document.createElement("br"); 
             container.appendChild(messageElement); 
