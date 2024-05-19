@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SummaryMe</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+
+</head>
+<body>
+    <div class="subheader">
+        <h1>Summary<span class="highlight">Me</span></h1>
+    </div>
+    <div class="chat-container" id="chat-container">
+        <!-- Messages will be dynamically added here -->
+    </div>
+
+    <input id="input-text" placeholder="Enter text to summarize"></input>
+    <button id="summarize-btn" disabled>&#10148;</button>
+
+
+    <script>
+        const inputText = document.getElementById("input-text");
+        const summarizeBtn = document.getElementById("summarize-btn");
+
+        inputText.addEventListener("input", function() {
+            if (inputText.value.trim() === "") {
+                summarizeBtn.disabled = true;
+            } else {
+                summarizeBtn.disabled = false;
+            }
+        });
+
+        document.getElementById("summarize-btn").addEventListener("click", function() {
+            var text = inputText.value;
+            addMessage("user", text);
+            inputText.value = "";
+            setTimeout(function() {
+                addTypingAnimation();
+                fetch('/summarize', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({text: text}),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    removeTypingAnimation();
+                    addMessage("bot", data.summary);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            }, 1000);
+        
+        });
+
+        function addMessage(sender, message) {
+            var container = document.getElementById("chat-container");
+            var messageElement = document.createElement("div");
+            messageElement.classList.add(sender + "-message");
+            messageElement.innerHTML = message; 
+
+            var br = document.createElement("br"); 
+            container.appendChild(messageElement); 
+            container.appendChild(br); 
+        }
+
+        function addTypingAnimation() {
+            var container = document.getElementById("chat-container");
+            var messageElement = document.createElement("div");
+            messageElement.classList.add("typing-animation");
+
+            for (var i = 0; i < 3; i++) {
+                var dot = document.createElement("span");
+                dot.classList.add("dot");
+                dot.innerText = ".";
+                messageElement.appendChild(dot);
+            }
+
+            container.appendChild(messageElement);
+        }
+
+        function removeTypingAnimation() {
+            var container = document.getElementById("chat-container");
+            var typingAnimation = container.querySelector(".typing-animation");
+            if (typingAnimation) {
+                container.removeChild(typingAnimation);
+            }
+        }
+    </script>
+</body>
+</html>

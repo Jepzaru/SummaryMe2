@@ -1,5 +1,6 @@
 # Ignore the virtual environment directory
 .venv/
+cnn_dailymail/
 
 # Ignore Python cache files
 __pycache__/
