@@ -3,6 +3,8 @@
 }
 body{
     background-color: #31363F;
+    overflow-y: hidden;
+    overflow-x: hidden;
 }
 .chat-container {
     position: absolute;
@@ -22,9 +24,18 @@ body{
 }
 
 .subheader img {
-    margin-right: 10px; /* Adjust the margin as needed */
-    height: 50px; /* Adjust the height as needed */
+    margin-right: 10px; 
+    height: 50px; 
 }
+.gif-container img {
+    position: absolute;
+    left: 190px;
+    top: 420px;
+    width: 300px; 
+    height: auto;
+    transform: scaleX(-1);
+}
+
 
 .subheader h1 {
     margin: 0;
@@ -64,8 +75,8 @@ body{
 .history-chats p{
     color: white;
     position: absolute;
-    top: 350px;
-    left: 100px;
+    top: 120px;
+    left: 30px;
     opacity: 0.5;
 
 }

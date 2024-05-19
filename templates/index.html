@@ -13,18 +13,26 @@
     <div class="subheader">
         <h1><img src="static/logo.png" alt="Logo">Summary<span class="highlight">Me</span></h1>
     </div>
+    <div class"subheader1">
+        <p style="color: white; font-size: 12px; margin-left: 60px;">Applied AI - Final Project</p>
+        </div>
     <div class="history-chats">
         <p>Chat History</p>
-    </div>
-    <div class="chat-container" id="chat-container">
-        <div class="center-logo">
-           <h4>👋Welcome to SummaryMe!</h4>
+        <div id="chat-history-container">
+            <!-- Chat history will be dynamically added here -->
         </div>
+    </div>
+    
+    <div class="chat-container" id="chat-container">
         <!-- Messages will be dynamically added here -->
     </div>
 
     <input id="input-text" placeholder="Enter text to summarize"></input>
     <button id="summarize-btn" disabled><i class="fas fa-paper-plane"></i></button>
+
+    <div class="gif-container">
+        <img src="static/bot.gif" alt="Welcome GIF">
+    </div>
 
     <script>
         const inputText = document.getElementById("input-text");
@@ -55,7 +63,7 @@
                 .then(response => response.json())
                 .then(data => {
                     removeTypingAnimation();
-                    addMessage("bot", data.summary);
+                    addMessage("bot", data.summary, true);
                     summarizeBtn.disabled = false; // Re-enable button after bot response
                 })
                 .catch((error) => {
@@ -63,10 +71,9 @@
                     summarizeBtn.disabled = false; // Re-enable button if there's an error
                 });
             }, 1000);
-        
         });
 
-        function addMessage(sender, message) {
+        function addMessage(sender, message, isTypingEffect = false) {
             var container = document.getElementById("chat-container");
             var logo = document.getElementById("center-logo");
             if (logo) {
@@ -75,21 +82,40 @@
 
             var messageElement = document.createElement("div");
             messageElement.classList.add(sender + "-message");
-            
+
             var icon = document.createElement("span");
             icon.classList.add("icon");
             if (sender === "user") {
-                icon.innerHTML = '<i class="fas fa-user"></i>'; // Font Awesome user icon
+                icon.innerHTML = ''; 
             } else {
                 icon.innerHTML = '<i class="fas fa-robot"></i>'; // Font Awesome robot icon
             }
-            
-            messageElement.appendChild(icon);
-            messageElement.innerHTML += message;
 
-            var br = document.createElement("br"); 
-            container.appendChild(messageElement); 
-            container.appendChild(br); 
+            messageElement.appendChild(icon);
+
+            var messageContent = document.createElement("span");
+            messageElement.appendChild(messageContent);
+
+            container.appendChild(messageElement);
+
+            if (isTypingEffect) {
+                let i = 0;
+                const speed = 10; // Typing speed in milliseconds
+
+                function typeWriter() {
+                    if (i < message.length) {
+                        messageContent.innerHTML += message.charAt(i);
+                        i++;
+                        setTimeout(typeWriter, speed);
+                    }
+                }
+                typeWriter();
+            } else {
+                messageContent.innerHTML = message;
+            }
+
+            var br = document.createElement("br");
+            container.appendChild(br);
         }
 
         function addTypingAnimation() {
@@ -114,6 +140,31 @@
                 container.removeChild(typingAnimation);
             }
         }
+
+        // Function to add initial greeting message on page load
+        function addGreetingMessage() {
+            addMessage("bot", "Hello there! Welcome to SummaryMe, feel free to summarize your sentences.", true);
+        }
+
+        // Add the greeting message when the page loads
+        window.onload = addGreetingMessage;
+
+        // Function to populate chat history
+function populateChatHistory(chatHistory) {
+    var container = document.getElementById("chat-history-container");
+
+    // Clear previous chat history
+    container.innerHTML = "";
+
+    // Loop through chat history and add messages to the container
+    chatHistory.forEach(function(message) {
+        var sender = message[1];
+        var messageText = message[2];
+        addMessage(sender, messageText);
+    });
+}
+
+        
     </script>
 </body>
 </html>
