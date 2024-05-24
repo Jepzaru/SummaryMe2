@@ -13,13 +13,15 @@
     <div class="subheader">
         <h1><img src="static/logo.png" alt="Logo">Summary<span class="highlight">Me</span></h1>
     </div>
-    <div class"subheader1">
+    <div class="subheader1">
         <p style="color: white; font-size: 12px; margin-left: 60px;">Applied AI - Final Project</p>
-        </div>
+    </div>
     <div class="history-chats">
         <p>Chat History</p>
-        <div id="chat-history-container">
+        <div class="chat-cont">
+        <div id="chat-history-container" style="margin-right: 10px;">
             <!-- Chat history will be dynamically added here -->
+        </div>
         </div>
     </div>
     
@@ -147,24 +149,42 @@
         }
 
         // Add the greeting message when the page loads
-        window.onload = addGreetingMessage;
+        window.onload = function() {
+            addGreetingMessage();
+            const chatHistory = JSON.parse('{{ chat_history | tojson | safe }}');
+            populateChatHistory(chatHistory);
+        };
 
         // Function to populate chat history
-function populateChatHistory(chatHistory) {
-    var container = document.getElementById("chat-history-container");
+        function populateChatHistory(chatHistory) {
+            var container = document.getElementById("chat-history-container");
 
-    // Clear previous chat history
-    container.innerHTML = "";
+            // Clear previous chat history
+            container.innerHTML = "";
 
-    // Loop through chat history and add messages to the container
-    chatHistory.forEach(function(message) {
-        var sender = message[1];
-        var messageText = message[2];
-        addMessage(sender, messageText);
-    });
-}
+            // Loop through chat history and add messages to the container
+            for (var i = 0; i < Math.min(chatHistory.length, 7); i++) {
+                var message = chatHistory[i];
+                var sender = message[1];
+                if (sender === "user") {
+                    var messageText = message[2];
+                    var truncatedMessage = messageText.split(' ').slice(0, 5).join(' ') + '...';
+                    addHistoryMessage(truncatedMessage);
+                }
+            }
+        }
+        function addHistoryMessage(message) {
+            var container = document.getElementById("chat-history-container");
 
-        
+            var messageElement = document.createElement("div");
+            messageElement.classList.add("history-message");
+
+            var messageContent = document.createElement("span");
+            messageContent.innerHTML = message;
+            messageElement.appendChild(messageContent);
+
+            container.appendChild(messageElement);
+        }
     </script>
 </body>
 </html>

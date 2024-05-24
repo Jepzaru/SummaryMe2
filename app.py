@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, jsonify
 from transformers_summarizer import summarize_text
 import mysql.connector
 
-
 app = Flask(__name__)
 
 # Initialize MySQL connection
@@ -28,25 +27,24 @@ def home():
         print("Error fetching chat history:", e)
         return "Error fetching chat history"
 
-
 @app.route('/summarize', methods=['POST'])
 def get_summary():
     data = request.get_json()
     text = data['text']
     summary = summarize_text(text)
-    
+   
     # Insert user message into the database
     sql = "INSERT INTO chat_history (sender, message) VALUES (%s, %s)"
     val = ("user", text)
     mycursor.execute(sql, val)
     mydb.commit()
-    
+   
     # Insert bot message into the database
     sql = "INSERT INTO chat_history (sender, message) VALUES (%s, %s)"
     val = ("bot", summary)
     mycursor.execute(sql, val)
     mydb.commit()
-    
+   
     return jsonify({'summary': summary})
 
 if __name__ == "__main__":
